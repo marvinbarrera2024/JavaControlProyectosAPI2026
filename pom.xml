@@ -103,7 +103,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.34</version>
+			<version>1.18.42</version>
 		</dependency>
 		<!-- FIN DE LAS DEPENDENCIAS INICIALES -->
 
@@ -124,7 +124,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.34</version>
+							<version>1.18.42</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -144,6 +144,20 @@
 						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>3.2.5</version>
+				<executions>
+					<execution>
+						<id>unit-test-html-report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report-only</goal>
 						</goals>
 					</execution>
 				</executions>
