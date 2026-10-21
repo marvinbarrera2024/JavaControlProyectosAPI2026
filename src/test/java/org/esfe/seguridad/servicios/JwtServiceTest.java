@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException;
 import org.esfe.seguridad.modelos.Rol;
 import org.esfe.seguridad.modelos.Usuario;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -27,7 +28,11 @@ class JwtServiceTest {
         ReflectionTestUtils.setField(jwtService, "SECRET_KEY", secret);
     }
 
+    /**
+     * Caso de prueba: debe incluir el login y el rol del usuario en el token generado.
+     */
     @Test
+    @DisplayName("Debe generar un token con el login y rol del usuario")
     void getTokenIncluyeLoginYRolDelUsuario() {
         Usuario usuario = crearUsuario("ana", "ADMIN");
 
@@ -38,7 +43,11 @@ class JwtServiceTest {
         assertEquals(List.of("ADMIN"), roles);
     }
 
+    /**
+     * Caso de prueba: debe aceptar el token únicamente para el usuario al que pertenece.
+     */
     @Test
+    @DisplayName("Debe validar el token solo para el mismo usuario")
     void isTokenValidSoloAceptaElMismoUsuario() {
         String token = jwtService.getToken(crearUsuario("ana", "USER"));
 
@@ -46,7 +55,11 @@ class JwtServiceTest {
         assertFalse(jwtService.isTokenValid(token, crearUsuario("otra", "USER")));
     }
 
+    /**
+     * Caso de prueba: debe rechazar un token cuya firma o contenido fue manipulado.
+     */
     @Test
+    @DisplayName("Debe rechazar un token manipulado")
     void rechazaTokenManipulado() {
         String token = jwtService.getToken(crearUsuario("ana", "USER"));
 

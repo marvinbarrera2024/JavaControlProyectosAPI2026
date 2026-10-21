@@ -2,6 +2,7 @@ package org.esfe.seguridad.servicios;
 
 import org.esfe.seguridad.modelos.Rol;
 import org.esfe.seguridad.repositorios.RolRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +27,11 @@ class RolServiceTest {
     @InjectMocks
     private RolService rolService;
 
+    /**
+     * Caso de prueba: debe devolver todos los roles registrados en el repositorio.
+     */
     @Test
+    @DisplayName("Debe listar todos los roles")
     void obtenerRolesDevuelveTodosLosRoles() {
         List<Rol> roles = List.of(
                 Rol.builder().id(1).nombre("ADMIN").build(),
@@ -39,7 +44,11 @@ class RolServiceTest {
         verify(rolRepository).findAll();
     }
 
+    /**
+     * Caso de prueba: debe devolver el rol correspondiente al identificador existente.
+     */
     @Test
+    @DisplayName("Debe consultar un rol por id")
     void obtenerPorIdDevuelveElRolExistente() {
         Rol rol = Rol.builder().id(3).nombre("ADMIN").build();
         when(rolRepository.findById(3)).thenReturn(Optional.of(rol));
@@ -50,7 +59,11 @@ class RolServiceTest {
         verify(rolRepository).findById(3);
     }
 
+    /**
+     * Caso de prueba: debe lanzar una excepción cuando no existe un rol con el identificador indicado.
+     */
     @Test
+    @DisplayName("Debe lanzar una excepción cuando el rol no existe")
     void obtenerPorIdLanzaExcepcionCuandoElRolNoExiste() {
         when(rolRepository.findById(99)).thenReturn(Optional.empty());
 

@@ -8,6 +8,7 @@ import org.esfe.seguridad.modelos.Usuario;
 import org.esfe.seguridad.repositorios.RolRepository;
 import org.esfe.seguridad.repositorios.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -72,7 +73,11 @@ class UsuarioServiceTest {
                 ReflectionTestUtils.setField(usuarioService, "authenticationManager", authenticationManager);
         }
 
-    @Test
+        /**
+         * Caso de prueba: debe autenticar al usuario y devolver un token válido.
+         */
+        @Test
+        @DisplayName("Debe autenticar al usuario y devolver un token")
     void loginAutenticaAlUsuarioYDevuelveToken() {
         UsuarioLogin login = UsuarioLogin.builder()
                 .login("ana")
@@ -96,7 +101,11 @@ class UsuarioServiceTest {
         verify(userRepository).findByLogin("ana");
     }
 
-    @Test
+        /**
+         * Caso de prueba: no debe buscar el usuario cuando falla la autenticación.
+         */
+        @Test
+        @DisplayName("No debe buscar al usuario cuando falla la autenticación")
     void loginNoBuscaUsuarioCuandoLaAutenticacionFalla() {
         UsuarioLogin login = UsuarioLogin.builder()
                 .login("ana")
@@ -110,7 +119,11 @@ class UsuarioServiceTest {
         verify(userRepository, never()).findByLogin(any(String.class));
     }
 
-    @Test
+        /**
+         * Caso de prueba: debe codificar la clave, asignar el rol, guardar al usuario y devolver su token.
+         */
+        @Test
+        @DisplayName("Debe registrar al usuario y devolver un token")
     void registroCodificaClaveAsignaRolGuardaUsuarioYDevuelveToken() {
         UsuarioRegistrar registro = UsuarioRegistrar.builder()
                 .nombre("Ana")
