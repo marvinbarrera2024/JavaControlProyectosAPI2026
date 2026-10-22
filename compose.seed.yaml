@@ -1,0 +1,23 @@
+services:
+  admin-bootstrap:
+    image: mysql:8.4
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_DATABASE: control_proyectos
+      MYSQL_PWD: "#2026@1021"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["exec mysql -h host.docker.internal -uroot \"$$MYSQL_DATABASE\" < /seed-admin.sql"]
+    volumes:
+      - ./database/seed-admin.sql:/seed-admin.sql:ro
+    restart: "no"
+
+  api:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      admin-bootstrap:
+        condition: service_completed_successfully

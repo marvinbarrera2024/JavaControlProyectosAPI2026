@@ -2,7 +2,6 @@ HELP.md
 target/
 .env
 .env.*
-!.env.example
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -34,3 +33,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Newman-generated reports
+/reports/
+/postman/newman.xml
+/postman/newman-report.html
+/k6/reports/
+/zap/reports/
