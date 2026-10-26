@@ -119,3 +119,64 @@ docker compose \
 ```
 
 Los reportes HTML y JSON se guardan en `zap/reports/zap-report.html` y `zap/reports/zap-report.json`. Revisa los hallazgos antes de usar cualquier modo de escaneo activo.
+
+
+## Publicar la imagen en GitHub Container Registry
+
+El nombre sugerido para la imagen es `ghcr.io/bt1141022012/control-proyectos-api`. La imagen contiene la API; MySQL debe ejecutarse por separado.
+
+1. Crea un token de acceso personal (clásico) en GitHub con el permiso `write:packages`. Si GitHub lo solicita, autoriza el token para SSO. No publiques ni compartas este token.
+2. Desde la raíz del proyecto, inicia sesión en GHCR. Cuando solicite la contraseña, pega el token de GitHub creado en el paso anterior (no la contraseña de tu cuenta). El token no se mostrará en pantalla:
+
+    ```bash
+    docker login ghcr.io -u bt1141022012
+    ```
+
+3. Construye la imagen y publícala con una etiqueta de versión y otra `latest` (puedes cambiar `v1.0.0` por la versión que corresponda):
+
+    ```bash
+    IMAGE=ghcr.io/bt1141022012/control-proyectos-api
+    VERSION=v1.0.0
+
+    docker build -f .dockerfile -t "$IMAGE:$VERSION" .
+    docker tag "$IMAGE:$VERSION" "$IMAGE:latest"
+    docker push "$IMAGE:$VERSION"
+    docker push "$IMAGE:latest"
+    ```
+
+4. Para permitir descargas públicas, abre el paquete en GitHub, entra en **Package settings** y cambia la visibilidad a **Public**. Los paquetes nuevos pueden quedar privados inicialmente.
+5. Comprueba la publicación descargando una etiqueta:
+
+    ```bash
+    docker pull ghcr.io/bt1141022012/control-proyectos-api:v1.0.0
+    ```
+
+Para una publicación posterior, repite la construcción y el push con una nueva etiqueta de versión. `latest` es solo otra etiqueta; Docker no la actualiza automáticamente.
+
+## Usar la imagen publicada con Docker Compose
+
+El archivo `compose.published.yaml` descarga `ghcr.io/bt1141022012/control-proyectos-api:v1.0.0`; no compila la API localmente. Clona el repositorio en el equipo donde quieras desplegarla y ejecuta los comandos desde su directorio raíz, donde también está `database/seed-admin.sql`.
+
+El paquete de GHCR debe ser público para descargarlo sin autenticar. Si es privado, inicia sesión en ese equipo con `docker login ghcr.io -u bt1141022012` y pega en el prompt de contraseña un token de GitHub con permiso `read:packages`.
+
+Se incluye un `.env` con valores solo para probar localmente y un `.env.example` como plantilla. El `.env` está excluido de Git. No uses las credenciales de prueba fuera de tu equipo.
+
+Para configurar otro entorno, copia los nombres de `.env.example` a `.env` y reemplaza los valores. Puedes generar contraseñas con `openssl rand -hex 32` y una clave JWT Base64 con `openssl rand -base64 64`:
+
+```dotenv
+MYSQL_ROOT_PASSWORD=pon_aqui_una_contrasena_generada
+MYSQL_PASSWORD=pon_aqui_otra_contrasena_generada
+SECURITY_JWT_SECRET_KEY=pon_aqui_la_clave_base64_generada
+```
+
+Levanta la base de datos, el seed y la API:
+
+```bash
+docker compose -f compose.published.yaml up -d
+```
+
+La API queda disponible en `http://localhost:8080`. El servicio de seed espera a que MySQL esté listo y solo ejecuta `database/seed-admin.sql` si faltan las tablas o alguno de los registros semilla (`ROLE_ADMIN`, `ROLE_USER` o el usuario `admin`). Si ya existen todos, omite el script. El volumen `published_mysql_data` conserva la base al detener los servicios:
+
+```bash
+docker compose -f compose.published.yaml down
+```
